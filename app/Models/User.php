@@ -18,10 +18,14 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
+    protected $table = 'usuarios';
+    protected $primaryKey = 'id_usuario';
+
     protected $fillable = [
-        'name',
+        'rol_id',
         'email',
         'password',
+        'estado',
     ];
 
     /**
@@ -45,5 +49,13 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+    public function rol()
+    {
+        return $this->belongsTo(Role::class, 'rol_id', 'id_rol');
+    }
+    public function persona()
+    {
+        return $this->hasOne(Persona::class, 'usuario_id', 'id_usuario');
     }
 }
