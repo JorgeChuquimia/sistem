@@ -52,17 +52,41 @@
                         class="flex items-center px-4 py-3 rounded-xl transition {{ request()->routeIs('usuarios.*') ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'text-gray-600 hover:bg-gray-100' }}">
                         <span class="mr-3 text-lg"></span> Usuarios
                     </a>
-                    <a href="#"
-                        class="flex items-center px-4 py-3 rounded-xl transition text-gray-600 hover:bg-gray-100">
-                        <span class="mr-3 text-lg"></span> Estudiantes
+                    <a href="{{ route('personas.index') }}"
+                        class="flex items-center px-4 py-3 rounded-xl transition {{ request()->routeIs('personas.*') ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'text-gray-600 hover:bg-gray-100' }}">
+                        <span class="mr-3 text-lg"></span> Personas
                     </a>
-                    <a href="#"
-                        class="flex items-center px-4 py-3 rounded-xl transition text-gray-600 hover:bg-gray-100">
+                    <a href="{{ route('docentes.index') }}"
+                        class="flex items-center px-4 py-3 rounded-xl transition {{ request()->routeIs('docentes.*') ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'text-gray-600 hover:bg-gray-100' }}">
                         <span class="mr-3 text-lg"></span> Docentes
                     </a>
-                    <a href="#"
-                        class="flex items-center px-4 py-3 rounded-xl transition text-gray-600 hover:bg-gray-100">
+                    <a href="{{ route('estudiantes.index') }}"
+                        class="flex items-center px-4 py-3 rounded-xl transition {{ request()->routeIs('estudiantes.*') ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'text-gray-600 hover:bg-gray-100' }}">
+                        <span class="mr-3 text-lg"></span> Estudiantes
+                    </a>
+                    <a href="{{ route('gestiones.index') }}"
+                        class="flex items-center px-4 py-3 rounded-xl transition {{ request()->routeIs('gestiones.*') ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'text-gray-600 hover:bg-gray-100' }}">
+                        <span class="mr-3 text-lg"></span> Gestiones
+                    </a>
+                    <a href="{{ route('niveles.index') }}"
+                        class="flex items-center px-4 py-3 rounded-xl transition {{ request()->routeIs('niveles.*') ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'text-gray-600 hover:bg-gray-100' }}">
+                        <span class="mr-3 text-lg"></span> Niveles
+                    </a>
+                    <a href="{{ route('grados.index') }}"
+                        class="flex items-center px-4 py-3 rounded-xl transition {{ request()->routeIs('grados.*') ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'text-gray-600 hover:bg-gray-100' }}">
+                        <span class="mr-3 text-lg"></span> Grados
+                    </a>
+                    <a href="{{ route('materias.index') }}"
+                        class="flex items-center px-4 py-3 rounded-xl transition {{ request()->routeIs('materias.*') ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'text-gray-600 hover:bg-gray-100' }}">
                         <span class="mr-3 text-lg"></span> Materias
+                    </a>
+                    <a href="{{ route('asignaciones.index') }}"
+                        class="flex items-center px-4 py-3 rounded-xl transition {{ request()->routeIs('asignaciones.*') ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'text-gray-600 hover:bg-gray-100' }}">
+                        <span class="mr-3 text-lg"></span> Asignaciones
+                    </a>
+                    <a href="{{ route('asistencias.index') }}"
+                        class="flex items-center px-4 py-3 rounded-xl transition {{ request()->routeIs('asistencias.*') ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'text-gray-600 hover:bg-gray-100' }}">
+                        <span class="mr-3 text-lg"></span> Asistencias
                     </a>
                 </nav>
             </div>
@@ -119,7 +143,7 @@
             </main>
 
             <footer class="bg-white border-t border-gray-200 py-6 px-8 text-center text-sm text-gray-500">
-                <p>&copy; Sistema Escolar. Desarrollado por Jorge Chuquimia Apaza</p>
+                <p>&copy; Sistema Escolar. Desarrollado por Jorge A. Chuquimia Apaza</p>
             </footer>
 
         </div>

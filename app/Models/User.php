@@ -58,4 +58,16 @@ class User extends Authenticatable
     {
         return $this->hasOne(Persona::class, 'usuario_id', 'id_usuario');
     }
+    public function docente()
+    {
+        // Un usuario tiene una persona, y esa persona tiene un docente
+        return $this->hasOneThrough(
+            Docente::class,
+            Persona::class,
+            'usuario_id', // Foreign key en la tabla personas (apunta a usuarios)
+            'persona_id', // Foreign key en la tabla docentes (apunta a personas)
+            'id_usuario', // Local key en la tabla usuarios
+            'id_persona'  // Local key en la tabla personas
+        );
+    }
 }

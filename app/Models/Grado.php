@@ -15,4 +15,8 @@ class Grado extends Model
         'paralelo',
         'estado',
     ];
+    public function nivel()
+    {
+        return $this->belongsTo(Nivel::class, 'nivel_id', 'id_nivel');
+    }
 }

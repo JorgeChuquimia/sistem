@@ -15,4 +15,8 @@ class Nivel extends Model
         'turno',
         'estado',
     ];
+    public function gestion()
+    {
+        return $this->belongsTo(Gestion::class, 'gestion_id', 'id_gestion');
+    }
 }
