@@ -11,8 +11,18 @@ class DocenteController extends Controller
     public function index()
     {
         $docentes = Docente::with('persona')->get();
-        $personas = Persona::all(); // Para asignarle los datos personales al crear el docente
-        return view('docentes.index', compact('docentes', 'personas'));
+
+        // 1. Personas disponibles para CREAR nuevos docentes (que no tienen registro docente aún)
+        $personasDisponibles = Persona::whereHas('usuario.rol', function ($query) {
+            $query->where('nombre_rol', 'DOCENTE');
+        })->doesntHave('docente')->get();
+
+        // 2. Todas las personas con rol DOCENTE (para que la edición nunca falle al buscar la actual)
+        $personas = Persona::whereHas('usuario.rol', function ($query) {
+            $query->where('nombre_rol', 'DOCENTE');
+        })->get();
+
+        return view('docentes.index', compact('docentes', 'personasDisponibles', 'personas'));
     }
 
     public function store(Request $request)

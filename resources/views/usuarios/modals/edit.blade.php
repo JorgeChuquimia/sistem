@@ -6,8 +6,11 @@
     style="display: none; top:-24px">
     <div class="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden p-6 space-y-4"
         @click.away="openEditModal = false">
-        <h3 class="font-bold text-gray-800 text-lg">Editar Usuario</h3>
-
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="font-bold text-gray-800 text-lg">Editar Usuario</h3>
+            <button @click="openEditModal = false"
+                class="text-gray-400 hover:text-gray-600 font-bold">&times;</button>
+        </div>
         <form :action="`/usuarios/${editId}`" method="POST" class="space-y-4">
             @csrf
             @method('PUT')
@@ -17,7 +20,7 @@
                 <select name="rol_id" x-model="editRolId" required
                     class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
                     @foreach ($roles as $rol)
-                        <option value="{{ $rol->id_rol }}">{{ $rol->nombre_rol }}</option>
+                    <option value="{{ $rol->id_rol }}">{{ $rol->nombre_rol }}</option>
                     @endforeach
                 </select>
             </div>

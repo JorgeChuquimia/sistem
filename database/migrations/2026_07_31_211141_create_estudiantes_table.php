@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('estudiantes', function (Blueprint $table) {
             $table->id('id_estudiante');
 
-            $table->unsignedBigInteger('persona_id');
+            $table->unsignedBigInteger('persona_id')->unique();
             $table->foreign('persona_id')->references('id_persona')->on('personas')->onDelete('cascade');
 
             // Nota: Las tablas 'niveles' y 'grados' las crearemos en un momento, 
@@ -22,7 +22,7 @@ return new class extends Migration
             $table->unsignedBigInteger('nivel_id');
             $table->unsignedBigInteger('grado_id');
 
-            $table->string('rude', 50);
+            $table->string('rude', 50)->unique();
 
             $table->boolean('estado')->default(true);
             $table->timestamps();

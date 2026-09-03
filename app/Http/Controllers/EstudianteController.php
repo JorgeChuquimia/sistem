@@ -13,11 +13,21 @@ class EstudianteController extends Controller
     public function index()
     {
         $estudiantes = Student::with(['persona', 'grado.nivel.gestion'])->get();
-        $personas = Persona::all();
+
+        // 1. Personas con rol ESTUDIANTE disponibles para CREAR (que tienen rol ESTUDIANTE y no están en la tabla estudiantes)
+        $personasDisponibles = Persona::whereHas('usuario.rol', function ($query) {
+            $query->where('nombre_rol', 'ESTUDIANTE');
+        })->whereDoesntHave('estudiante')->get();
+
+        // 2. Todas las personas con rol ESTUDIANTE (para que la edición nunca falle al buscar la actual)
+        $personas = Persona::whereHas('usuario.rol', function ($query) {
+            $query->where('nombre_rol', 'ESTUDIANTE');
+        })->get();
+
         $niveles = Nivel::all();
         $grados = Grado::all();
 
-        return view('estudiantes.index', compact('estudiantes', 'personas', 'niveles', 'grados'));
+        return view('estudiantes.index', compact('estudiantes', 'personasDisponibles', 'personas', 'niveles', 'grados'));
     }
 
     public function store(Request $request)

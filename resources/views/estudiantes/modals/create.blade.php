@@ -21,7 +21,7 @@
                 <select name="persona_id" required
                     class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
                     <option value="">Seleccione...</option>
-                    @foreach ($personas as $persona)
+                    @foreach ($personasDisponibles as $persona)
                         <option value="{{ $persona->id_persona }}">{{ $persona->nombres }} {{ $persona->apellidos }}
                             (CI: {{ $persona->ci }})</option>
                     @endforeach

@@ -111,9 +111,9 @@
 
                     <h2 class="text-lg md:text-xl font-bold text-gray-800 tracking-tight">
                         @isset($header)
-                            {{ $header }}
+                        {{ $header }}
                         @else
-                            Panel General
+                        Panel General
                         @endisset
                     </h2>
                 </div>

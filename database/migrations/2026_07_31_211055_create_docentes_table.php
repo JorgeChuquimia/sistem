@@ -15,12 +15,12 @@ return new class extends Migration
             $table->id('id_docente');
 
             // Llave foránea hacia personas
-            $table->unsignedBigInteger('persona_id');
+            $table->unsignedBigInteger('persona_id')->unique();
             $table->foreign('persona_id')->references('id_persona')->on('personas')->onDelete('cascade');
 
             $table->string('especialidad');
             $table->string('antiguedad');
-            $table->string('rda', 20);
+            $table->string('rda', 20)->unique();
 
             $table->boolean('estado')->default(true);
             $table->timestamps();

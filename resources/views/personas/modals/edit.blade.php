@@ -19,7 +19,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Usuario del Sistema</label>
-                    <select name="usuario_id" x-model="editUsuarioId" required
+                    <select disabled name="usuario_id" x-model="editUsuarioId" required
                         class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
                         @foreach ($usuarios as $usuario)
                             <option value="{{ $usuario->id_usuario }}">{{ $usuario->email }}</option>

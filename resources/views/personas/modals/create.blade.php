@@ -21,10 +21,13 @@
                     <label class="block text-sm font-medium text-gray-700 mb-1">Usuario del Sistema</label>
                     <select name="usuario_id" required
                         class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
-                        <option value="">Seleccione un usuario...</option>
-                        @foreach ($usuarios as $usuario)
-                            <option value="{{ $usuario->id_usuario }}">{{ $usuario->email }}</option>
+                        <option value="">Seleccione un usuario</option>
+
+                        <!-- Cambiamos $usuarios por $usuariosLibres -->
+                        @foreach ($usuariosLibres as $usuario)
+                        <option value="{{ $usuario->id_usuario }}">{{ $usuario->email }}</option>
                         @endforeach
+
                     </select>
                 </div>
 

@@ -11,8 +11,9 @@ class PersonaController extends Controller
     public function index()
     {
         $personas = Persona::with('usuario')->get();
-        $usuarios = User::all(); // Para asociar la persona a un usuario existente si es necesario
-        return view('personas.index', compact('personas', 'usuarios'));
+        $usuariosLibres = User::doesntHave('persona')->get();
+        $usuarios = User::all(); // Para asociar la persona a un usuario existente si es necesario en la vista
+        return view('personas.index', compact('personas', 'usuariosLibres', 'usuarios'));
     }
 
     public function store(Request $request)
@@ -21,11 +22,11 @@ class PersonaController extends Controller
             'usuario_id' => 'required|exists:usuarios,id_usuario',
             'nombres' => 'required|string|max:50',
             'apellidos' => 'required|string|max:50',
-            'ci' => 'required|string|max:20',
+            'ci' => 'required|string|max:20|unique:personas,ci',
             'fecha_nacimiento' => 'required|string|max:20',
             'profesion' => 'required|string|max:50',
             'direccion' => 'required|string|max:255',
-            'celular' => 'required|string|max:20',
+            'celular' => 'required|string|max:20|unique:personas,celular',
         ]);
 
         Persona::create([
@@ -48,18 +49,19 @@ class PersonaController extends Controller
         $persona = Persona::findOrFail($id);
 
         $request->validate([
-            'usuario_id' => 'required|exists:usuarios,id_usuario',
             'nombres' => 'required|string|max:50',
             'apellidos' => 'required|string|max:50',
-            'ci' => 'required|string|max:20',
+            // Validamos unicidad ignorando el id_persona actual
+            'ci' => 'required|string|max:20|unique:personas,ci,' . $id . ',id_persona',
             'fecha_nacimiento' => 'required|string|max:20',
             'profesion' => 'required|string|max:50',
             'direccion' => 'required|string|max:255',
-            'celular' => 'required|string|max:20',
+            // Validamos unicidad ignorando el id_persona actual
+            'celular' => 'required|string|max:20|unique:personas,celular,' . $id . ',id_persona',
         ]);
 
+        // El usuario_id se omite intencionalmente para proteger la integridad de la relación 1:1
         $persona->update([
-            'usuario_id' => $request->usuario_id,
             'nombres' => $request->nombres,
             'apellidos' => $request->apellidos,
             'ci' => $request->ci,

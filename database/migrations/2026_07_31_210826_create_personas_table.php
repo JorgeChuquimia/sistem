@@ -15,16 +15,16 @@ return new class extends Migration
             $table->id('id_persona'); // Llave primaria personalizada
 
             // Llave foránea hacia la tabla usuarios
-            $table->unsignedBigInteger('usuario_id');
+            $table->unsignedBigInteger('usuario_id')->unique();
             $table->foreign('usuario_id')->references('id_usuario')->on('usuarios')->onDelete('cascade');
 
             $table->string('nombres', 50);
             $table->string('apellidos', 50);
-            $table->string('ci', 20);
+            $table->string('ci', 20)->unique();
             $table->string('fecha_nacimiento', 20);
             $table->string('profesion', 50);
             $table->string('direccion', 255);
-            $table->string('celular', 20);
+            $table->string('celular', 20)->unique();
 
             $table->boolean('estado')->default(true);
             $table->timestamps(); // created_at y updated_at
