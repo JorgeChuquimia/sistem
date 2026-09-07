@@ -3,125 +3,132 @@
 namespace App\Http\Controllers;
 
 use App\Models\Asistencia;
-use App\Models\Docente;
 use App\Models\Student;
+use App\Models\Docente;
 use App\Models\Materia;
-use App\Models\Asignacion;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 
 class AsistenciaController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     */
     public function index()
     {
-        $user = auth()->user();
-
-        // 1. Obtenemos las asistencias filtradas mediante el scope del modelo
-        $asistencias = Asistencia::with(['docente.persona', 'estudiante.persona', 'materia'])
-            ->filtrarPorRol($user)
-            ->latest()
+        $asistencias = Asistencia::with(['estudiante.persona', 'docente.persona', 'materia'])
+            ->filtrarPorRol(Auth::user())
             ->get();
 
-        // 2. Cargamos los datos para los select de los modales según el rol
-        $datos = $this->obtenerDatosParaModales($user);
+        $estudiantes = Student::with('persona')->get();
+        $docentes = Docente::with('persona')->get();
+        $materias = Materia::all();
 
-        return view('asistencias.index', compact('asistencias') + $datos);
+        return view('asistencias.index', compact('asistencias', 'estudiantes', 'docentes', 'materias'));
     }
 
-    private function obtenerDatosParaModales($user)
-    {
-        // Si es Administrador (rol_id == 1) ve todo de forma global
-        if ($user->rol_id == 1) {
-            return [
-                'docentes' => Docente::with('persona')->get(),
-                'materias' => Materia::all(),
-                'estudiantes' => Student::with('persona')->get()
-            ];
-        }
-
-        // Si es Docente (rol_id == 2) solo ve sus asignaciones reales
-        $docente = $user->docente;
-
-        if (!$docente) {
-            return [
-                'docentes' => [],
-                'materias' => collect(),
-                'estudiantes' => collect()
-            ];
-        }
-
-        $asignaciones = Asignacion::where('docente_id', $docente->id_docente)->get();
-
-        return [
-            'docentes' => [$docente], // Solo él mismo
-            'materias' => Materia::whereIn('id_materia', $asignaciones->pluck('materia_id'))->get(),
-            'estudiantes' => Student::whereIn('grado_id', $asignaciones->pluck('grado_id'))->with('persona')->get()
-        ];
-    }
-
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(Request $request)
     {
-        $user = auth()->user();
-
-        // Si es un docente, forzamos de manera segura que el docente_id sea el suyo propio
-        if ($user->rol_id == 2 && $user->docente) {
-            $request->merge(['docente_id' => $user->docente->id_docente]);
+        // Si el usuario autenticado es un docente, forzamos su ID por seguridad
+        if (Auth::user()->docente) {
+            $request->merge([
+                'docente_id' => Auth::user()->docente->id_docente
+            ]);
         }
 
         $request->validate([
-            'docente_id' => 'required|exists:docentes,id_docente',
             'estudiante_id' => 'required|exists:estudiantes,id_estudiante',
-            'materia_id' => 'required|exists:materias,id_materia',
-            'fecha' => 'required|string|max:50',
-            'observacion' => 'nullable|string|max:255',
-            'estado' => 'required|boolean',
+            'docente_id'    => 'required|exists:docentes,id_docente',
+            'materia_id'    => 'required|exists:materias,id_materia',
+            'fecha'         => [
+                'required',
+                'date',
+                Rule::unique('asistencias')->where(function ($query) use ($request) {
+                    return $query->where('estudiante_id', $request->estudiante_id)
+                        ->where('materia_id', $request->materia_id)
+                        ->where('fecha', $request->fecha);
+                }),
+            ],
+            // Validamos que sea booleano (1 o 0) ya que la base de datos es tinyint
+            'estado'        => 'required|boolean',
+            'observacion'   => 'nullable|string|max:255',
+        ], [
+            'fecha.unique' => 'Este estudiante ya tiene registrada una asistencia para esta materia en la misma fecha.',
         ]);
 
-        Asistencia::create($request->all());
+        Asistencia::create([
+            'docente_id'    => $request->docente_id,
+            'estudiante_id' => $request->estudiante_id,
+            'materia_id'    => $request->materia_id,
+            'fecha'         => $request->fecha,
+            'estado'        => $request->estado,
+            'observacion'   => $request->observacion,
+        ]);
 
-        return redirect()->route('asistencias.index')->with('success', 'Asistencia registrada correctamente.');
+        return redirect()->route('asistencias.index')
+            ->with('success', 'Asistencia registrada correctamente.');
     }
 
+    /**
+     * Update the specified resource in storage.
+     */
     public function update(Request $request, $id)
     {
         $asistencia = Asistencia::findOrFail($id);
-        $user = auth()->user();
 
-        // Seguridad extra: Si es docente, aseguramos que no modifique registros ajenos
-        if ($user->rol_id == 2 && $user->docente) {
-            if ($asistencia->docente_id !== $user->docente->id_docente) {
-                abort(403, 'No autorizado para modificar este registro.');
-            }
-            $request->merge(['docente_id' => $user->docente->id_docente]);
+        // Si es un docente, mantenemos o forzamos su propio ID
+        if (Auth::user()->docente) {
+            $request->merge([
+                'docente_id' => Auth::user()->docente->id_docente
+            ]);
         }
 
         $request->validate([
-            'docente_id' => 'required|exists:docentes,id_docente',
             'estudiante_id' => 'required|exists:estudiantes,id_estudiante',
-            'materia_id' => 'required|exists:materias,id_materia',
-            'fecha' => 'required|string|max:50',
-            'observacion' => 'nullable|string|max:255',
-            'estado' => 'required|boolean',
+            'docente_id'    => 'required|exists:docentes,id_docente',
+            'materia_id'    => 'required|exists:materias,id_materia',
+            'fecha'         => [
+                'required',
+                'date',
+                Rule::unique('asistencias')->where(function ($query) use ($request) {
+                    return $query->where('estudiante_id', $request->estudiante_id)
+                        ->where('materia_id', $request->materia_id)
+                        ->where('fecha', $request->fecha);
+                })->ignore($asistencia->id_asistencia, 'id_asistencia'),
+            ],
+            // Validamos que sea booleano (1 o 0)
+            'estado'        => 'required|boolean',
+            'observacion'   => 'nullable|string|max:255',
+        ], [
+            'fecha.unique' => 'Ya existe otro registro de asistencia para este estudiante en la misma fecha y materia.',
         ]);
 
-        $asistencia->update($request->all());
+        $asistencia->update([
+            'docente_id'    => $request->docente_id,
+            'estudiante_id' => $request->estudiante_id,
+            'materia_id'    => $request->materia_id,
+            'fecha'         => $request->fecha,
+            'estado'        => $request->estado,
+            'observacion'   => $request->observacion,
+        ]);
 
-        return redirect()->route('asistencias.index')->with('success', 'Asistencia actualizada correctamente.');
+        return redirect()->route('asistencias.index')
+            ->with('success', 'Asistencia actualizada correctamente.');
     }
 
+    /**
+     * Remove the specified resource from storage.
+     */
     public function destroy($id)
     {
         $asistencia = Asistencia::findOrFail($id);
-        $user = auth()->user();
-
-        // Seguridad extra para la eliminación
-        if ($user->rol_id == 2 && $user->docente) {
-            if ($asistencia->docente_id !== $user->docente->id_docente) {
-                abort(403, 'No autorizado para eliminar este registro.');
-            }
-        }
-
         $asistencia->delete();
 
-        return redirect()->route('asistencias.index')->with('success', 'Asistencia eliminada correctamente.');
+        return redirect()->route('asistencias.index')
+            ->with('success', 'Asistencia eliminada correctamente.');
     }
 }

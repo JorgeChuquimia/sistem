@@ -3,7 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RolController;
-use App\http\Controllers\UserController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\PersonaController;
 use App\Http\Controllers\DocenteController;
 use App\Http\Controllers\NivelController;

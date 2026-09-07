@@ -17,6 +17,8 @@ class MateriaController extends Controller
     {
         $request->validate([
             'nombre_materia' => 'required|string|max:100|unique:materias,nombre_materia',
+        ], [
+            'nombre_materia.unique' => 'Ya existe una materia registrada con este mismo nombre.'
         ]);
 
         Materia::create([
@@ -33,6 +35,8 @@ class MateriaController extends Controller
 
         $request->validate([
             'nombre_materia' => 'required|string|max:100|unique:materias,nombre_materia,' . $id . ',id_materia',
+        ], [
+            'nombre_materia.unique' => 'Ya existe otra materia registrada con este mismo nombre.'
         ]);
 
         $materia->update([

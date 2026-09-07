@@ -16,11 +16,12 @@
             @method('PUT')
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Rol del Sistema</label>
-                <select name="rol_id" x-model="editRolId" required
-                    class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Rol del Sistema (No modificable)</label>
+                <!-- Select inhabilitado puramente visual -->
+                <select disabled
+                    class="w-full rounded-xl border-gray-200 bg-gray-100 text-gray-500 shadow-sm text-sm cursor-not-allowed">
                     @foreach ($roles as $rol)
-                    <option value="{{ $rol->id_rol }}">{{ $rol->nombre_rol }}</option>
+                    <option value="{{ $rol->id_rol }}" :selected="editRolId == '{{ $rol->id_rol }}'">{{ $rol->nombre_rol }}</option>
                     @endforeach
                 </select>
             </div>

@@ -15,23 +15,30 @@
         deleteNombre: ''
     }">
 
+        <!-- Alerta de Éxito (4 segundos) -->
         @if (session('success'))
-            <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 4000)" x-show="show"
-                class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl text-sm shadow-sm flex justify-between items-center">
-                <span>{{ session('success') }}</span>
-                <button @click="show = false"
-                    class="text-emerald-500 hover:text-emerald-700 font-bold ml-4">&times;</button>
-            </div>
+        <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 4000)" x-show="show"
+            x-transition.duration.500ms
+            class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl text-sm shadow-sm flex justify-between items-center">
+            <span>{{ session('success') }}</span>
+            <button @click="show = false"
+                class="text-emerald-500 hover:text-emerald-700 font-bold ml-4">&times;</button>
+        </div>
         @endif
 
+        <!-- Alerta de Errores / Duplicados (3 segundos) -->
         @if ($errors->any())
-            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm shadow-sm">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>&bull; {{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
+        <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 3000)" x-show="show"
+            x-transition.duration.500ms
+            class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm shadow-sm flex justify-between items-center">
+            <ul>
+                @foreach ($errors->all() as $error)
+                <li>&bull; {{ $error }}</li>
+                @endforeach
+            </ul>
+            <button @click="show = false"
+                class="text-red-400 hover:text-red-700 font-bold ml-4 text-base">&times;</button>
+        </div>
         @endif
 
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -56,33 +63,34 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-100 text-sm">
                         @forelse ($niveles as $nivel)
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-gray-500 font-medium">{{ $nivel->id_nivel }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap font-semibold text-gray-900">
-                                    {{ $nivel->gestion->gestion ?? '-' }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap font-semibold text-gray-900">{{ $nivel->nivel }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-gray-600">
-                                    <span
-                                        class="px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-50 text-purple-700">
-                                        {{ $nivel->turno }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right space-x-3">
-                                    <button
-                                        @click="openEditModal = true; editId = '{{ $nivel->id_nivel }}'; editGestionId = '{{ $nivel->gestion_id }}'; editNivel = '{{ $nivel->nivel }}'; editTurno = '{{ $nivel->turno }}'"
-                                        class="text-indigo-600 hover:text-indigo-900 font-medium">Editar</button>
-                                    <button
-                                        @click="openDeleteModal = true; deleteId = '{{ $nivel->id_nivel }}'; deleteNombre = '{{ $nivel->nivel }} ({{ $nivel->turno }})'"
-                                        class="text-red-600 hover:text-red-900 font-medium">Eliminar</button>
-                                </td>
-                            </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-500 font-medium">{{ $nivel->id_nivel }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap font-semibold text-gray-900">
+                                {{ $nivel->gestion->gestion ?? '-' }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap font-semibold text-gray-900">{{ $nivel->nivel }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-600">
+                                <span
+                                    class="px-2.5 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-50 text-purple-700">
+                                    {{ $nivel->turno }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right space-x-3">
+                                <button
+                                    @click="openEditModal = true; editId = '{{ $nivel->id_nivel }}'; editGestionId = '{{ $nivel->gestion_id }}'; editNivel = '{{ $nivel->nivel }}'; editTurno = '{{ $nivel->turno }}'"
+                                    class="text-indigo-600 hover:text-indigo-900 font-medium">Editar</button>
+                                <button
+                                    @click="openDeleteModal = true; deleteId = '{{ $nivel->id_nivel }}'; deleteNombre = '{{ $nivel->nivel }} ({{ $nivel->turno }})'"
+                                    class="text-red-600 hover:text-red-900 font-medium">Eliminar</button>
+                            </td>
+                        </tr>
                         @empty
-                            <tr>
-                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">No hay niveles
-                                    registrados.</td>
-                            </tr>
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">No hay niveles
+                                registrados.</td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>

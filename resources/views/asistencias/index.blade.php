@@ -4,7 +4,7 @@
     </x-slot>
 
     <div class="space-y-6" x-data="{
-        openCreateModal: false,
+        openCreateModal: {{ $errors->any() ? 'true' : 'false' }},
         openEditModal: false,
         openDeleteModal: false,
         editId: '',
@@ -19,12 +19,12 @@
 
         {{-- Alertas --}}
         @if (session('success'))
-            <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 4000)" x-show="show"
-                class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl text-sm shadow-sm flex justify-between items-center">
-                <span>{{ session('success') }}</span>
-                <button @click="show = false"
-                    class="text-emerald-500 hover:text-emerald-700 font-bold ml-4">&times;</button>
-            </div>
+        <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 4000)" x-show="show"
+            class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-xl text-sm shadow-sm flex justify-between items-center">
+            <span>{{ session('success') }}</span>
+            <button @click="show = false"
+                class="text-emerald-500 hover:text-emerald-700 font-bold ml-4">&times;</button>
+        </div>
         @endif
 
         {{-- Tabla de Asistencias --}}
@@ -41,8 +41,7 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Estudiante
-                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Estudiante</th>
                             <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Docente</th>
                             <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Materia</th>
                             <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Fecha</th>
@@ -52,28 +51,27 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-100 text-sm">
                         @forelse ($asistencias as $asistencia)
-                            <tr>
-                                <td class="px-6 py-4 font-semibold text-gray-900">
-                                    {{ $asistencia->estudiante->persona->nombres ?? '' }}
-                                    {{ $asistencia->estudiante->persona->apellidos ?? '' }}
-                                </td>
-                                <td class="px-6 py-4 text-gray-700">
-                                    {{ $asistencia->docente->persona->nombres ?? '' }}
-                                    {{ $asistencia->docente->persona->apellidos ?? '' }}
-                                </td>
-                                <td class="px-6 py-4 text-gray-700">{{ $asistencia->materia->nombre_materia ?? '' }}
-                                </td>
-                                <td class="px-6 py-4 text-gray-700">{{ $asistencia->fecha }}</td>
-                                <td class="px-6 py-4">
-                                    <span
-                                        class="px-2.5 py-1 text-xs font-semibold rounded-full {{ $asistencia->estado ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700' }}">
-                                        {{ $asistencia->estado ? 'Presente' : 'Falta' }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 text-right space-x-2">
-                                    {{-- Botón Editar --}}
-                                    <button
-                                        @click="
+                        <tr>
+                            <td class="px-6 py-4 font-semibold text-gray-900">
+                                {{ $asistencia->estudiante->persona->nombres ?? '' }}
+                                {{ $asistencia->estudiante->persona->apellidos ?? '' }}
+                            </td>
+                            <td class="px-6 py-4 text-gray-700">
+                                {{ $asistencia->docente->persona->nombres ?? '' }}
+                                {{ $asistencia->docente->persona->apellidos ?? '' }}
+                            </td>
+                            <td class="px-6 py-4 text-gray-700">{{ $asistencia->materia->nombre_materia ?? '' }}</td>
+                            <td class="px-6 py-4 text-gray-700">{{ $asistencia->fecha }}</td>
+                            <td class="px-6 py-4">
+                                <span
+                                    class="px-2.5 py-1 text-xs font-semibold rounded-full {{ $asistencia->estado == 'Presente' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700' }}">
+                                    {{ $asistencia->estado }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-right space-x-2">
+                                {{-- Botón Editar --}}
+                                <button
+                                    @click="
                                             openEditModal = true;
                                             editId = '{{ $asistencia->id_asistencia }}';
                                             editEstudianteId = '{{ $asistencia->estudiante_id }}';
@@ -83,18 +81,18 @@
                                             editEstado = '{{ $asistencia->estado }}';
                                             editObservacion = '{{ $asistencia->observacion }}';
                                         "
-                                        class="text-amber-600 hover:text-amber-900 font-medium">Editar</button>
+                                    class="text-amber-600 hover:text-amber-900 font-medium">Editar</button>
 
-                                    {{-- Botón Eliminar --}}
-                                    <button
-                                        @click="openDeleteModal = true; deleteId = '{{ $asistencia->id_asistencia }}'"
-                                        class="text-red-600 hover:text-red-900 font-medium">Eliminar</button>
-                                </td>
-                            </tr>
+                                {{-- Botón Eliminar --}}
+                                <button
+                                    @click="openDeleteModal = true; deleteId = '{{ $asistencia->id_asistencia }}'"
+                                    class="text-red-600 hover:text-red-900 font-medium">Eliminar</button>
+                            </td>
+                        </tr>
                         @empty
-                            <tr>
-                                <td colspan="6" class="px-6 py-4 text-center text-gray-500">No hay registros.</td>
-                            </tr>
+                        <tr>
+                            <td colspan="6" class="px-6 py-4 text-center text-gray-500">No hay registros.</td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>

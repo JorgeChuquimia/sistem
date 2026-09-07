@@ -13,6 +13,17 @@
                 class="text-gray-400 hover:text-gray-600 font-bold">&times;</button>
         </div>
 
+        {{-- Alerta de errores de validación (Muestra el mensaje de duplicado) --}}
+        @if ($errors->any())
+        <div class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+            <ul class="list-disc list-inside space-y-1">
+                @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+
         <form action="{{ route('asistencias.store') }}" method="POST" class="space-y-4">
             @csrf
 
@@ -23,26 +34,31 @@
                     class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
                     <option value="">Seleccione un estudiante...</option>
                     @foreach ($estudiantes as $estudiante)
-                        <option value="{{ $estudiante->id_estudiante }}">
-                            {{ $estudiante->persona->nombres ?? '' }} {{ $estudiante->persona->apellidos ?? '' }}
-                        </option>
+                    <option value="{{ $estudiante->id_estudiante }}" {{ old('estudiante_id') == $estudiante->id_estudiante ? 'selected' : '' }}>
+                        {{ $estudiante->persona->nombres ?? '' }} {{ $estudiante->persona->apellidos ?? '' }}
+                    </option>
                     @endforeach
                 </select>
             </div>
 
-            {{-- Selector de Docente --}}
+            {{-- Selector o campo fijo de Docente --}}
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Docente</label>
+                @if(Auth::user()->docente)
+                <input type="hidden" name="docente_id" value="{{ Auth::user()->docente->id_docente }}">
+                <input type="text" disabled value="{{ Auth::user()->docente->persona->nombres ?? '' }} {{ Auth::user()->docente->persona->apellidos ?? '' }} (RDA: {{ Auth::user()->docente->rda ?? '' }})"
+                    class="w-full rounded-xl border-gray-200 bg-gray-100 shadow-sm text-sm text-gray-600 cursor-not-allowed">
+                @else
                 <select name="docente_id" required
                     class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
                     <option value="">Seleccione un docente...</option>
                     @foreach ($docentes as $docente)
-                        <option value="{{ $docente->id_docente }}">
-                            {{ $docente->persona->nombres ?? '' }} {{ $docente->persona->apellidos ?? '' }} (RDA:
-                            {{ $docente->rda }})
-                        </option>
+                    <option value="{{ $docente->id_docente }}" {{ old('docente_id') == $docente->id_docente ? 'selected' : '' }}>
+                        {{ $docente->persona->nombres ?? '' }} {{ $docente->persona->apellidos ?? '' }} (RDA: {{ $docente->rda ?? '' }})
+                    </option>
                     @endforeach
                 </select>
+                @endif
             </div>
 
             {{-- Selector de Materia --}}
@@ -52,7 +68,9 @@
                     class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
                     <option value="">Seleccione una materia...</option>
                     @foreach ($materias as $materia)
-                        <option value="{{ $materia->id_materia }}">{{ $materia->nombre_materia }}</option>
+                    <option value="{{ $materia->id_materia }}" {{ old('materia_id') == $materia->id_materia ? 'selected' : '' }}>
+                        {{ $materia->nombre_materia }}
+                    </option>
                     @endforeach
                 </select>
             </div>
@@ -60,24 +78,25 @@
             {{-- Fecha --}}
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Fecha</label>
-                <input type="date" name="fecha" value="{{ date('Y-m-d') }}" required
+                <input type="date" name="fecha" value="{{ old('fecha', date('Y-m-d')) }}" required
                     class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
             </div>
 
-            {{-- Estado (1: Presente, 0: Falta) --}}
+            {{-- Estado --}}
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
-                <select name="estado" required
-                    class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
-                    <option value="1">Presente</option>
-                    <option value="0">Falta</option>
+                <select name="estado" required class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
+                    <option value="Presente" {{ old('estado') == 'Presente' ? 'selected' : '' }}>Presente</option>
+                    <option value="Ausente" {{ old('estado') == 'Ausente' ? 'selected' : '' }}>Ausente</option>
+                    <option value="Atraso" {{ old('estado') == 'Atraso' ? 'selected' : '' }}>Atraso</option>
+                    <option value="Licencia" {{ old('estado') == 'Licencia' ? 'selected' : '' }}>Licencia</option>
                 </select>
             </div>
 
             {{-- Observación (Opcional) --}}
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Observación (Opcional)</label>
-                <input type="text" name="observacion" placeholder="Ej. Atraso justificado"
+                <input type="text" name="observacion" value="{{ old('observacion') }}" placeholder="Ej. Atraso justificado"
                     class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
             </div>
 

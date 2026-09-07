@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Grado;
 use App\Models\Nivel;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class GradoController extends Controller
 {
@@ -19,8 +20,19 @@ class GradoController extends Controller
     {
         $request->validate([
             'nivel_id' => 'required|exists:niveles,id_nivel',
-            'curso' => 'required|string|max:100',
+            'curso' => [
+                'required',
+                'string',
+                'max:100',
+                // Validamos que la combinación de nivel, curso y paralelo sea única
+                Rule::unique('grados')->where(function ($query) use ($request) {
+                    return $query->where('nivel_id', $request->nivel_id)
+                        ->where('paralelo', $request->paralelo);
+                }),
+            ],
             'paralelo' => 'required|string|max:50',
+        ], [
+            'curso.unique' => 'Ya existe un curso con este mismo paralelo registrado para el nivel seleccionado.'
         ]);
 
         Grado::create([
@@ -39,8 +51,19 @@ class GradoController extends Controller
 
         $request->validate([
             'nivel_id' => 'required|exists:niveles,id_nivel',
-            'curso' => 'required|string|max:100',
+            'curso' => [
+                'required',
+                'string',
+                'max:100',
+                // Único ignorando el registro actual que estamos editando
+                Rule::unique('grados')->where(function ($query) use ($request) {
+                    return $query->where('nivel_id', $request->nivel_id)
+                        ->where('paralelo', $request->paralelo);
+                })->ignore($id, 'id_grado'),
+            ],
             'paralelo' => 'required|string|max:50',
+        ], [
+            'curso.unique' => 'Ya existe otro curso con este mismo paralelo registrado para el nivel seleccionado.'
         ]);
 
         $grado->update([

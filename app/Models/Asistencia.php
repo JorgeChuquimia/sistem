@@ -17,6 +17,8 @@ class Asistencia extends Model
         'observacion',
         'estado',
     ];
+
+    // Relaciones del modelo
     public function docente()
     {
         return $this->belongsTo(Docente::class, 'docente_id', 'id_docente');
@@ -31,15 +33,16 @@ class Asistencia extends Model
     {
         return $this->belongsTo(Materia::class, 'materia_id', 'id_materia');
     }
+
+    // Scope para filtrar las asistencias de forma segura por el NOMBRE del rol
     public function scopeFiltrarPorRol($query, $user)
     {
-        // Si el rol es Administrador (asumiendo que id_rol == 1 es Administrador)
-        if ($user->rol_id == 1) {
+        // Evaluamos con nombre_rol según tu modelo Role
+        if ($user->rol && $user->rol->nombre_rol === 'Administrador') {
             return $query;
         }
 
-        // Si es Docente (asumiendo que id_rol == 2 es Docente)
-        if ($user->rol_id == 2 && $user->docente) {
+        if ($user->rol && $user->rol->nombre_rol === 'Docente' && $user->docente) {
             return $query->where('docente_id', $user->docente->id_docente);
         }
 

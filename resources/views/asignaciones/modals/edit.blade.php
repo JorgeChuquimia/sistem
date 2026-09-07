@@ -21,10 +21,9 @@
                 <select name="docente_id" x-model="editDocenteId" required
                     class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
                     @foreach ($docentes as $docente)
-                        <option value="{{ $docente->id_docente }}">
-                            {{ $docente->persona->nombre ?? '' }} {{ $docente->persona->ap_paterno ?? '' }} (RDA:
-                            {{ $docente->rda }})
-                        </option>
+                    <option value="{{ $docente->id_docente }}">
+                        {{ $docente->persona->nombres }} {{ $docente->persona->apellidos }} (RDA: {{ $docente->rda }})
+                    </option>
                     @endforeach
                 </select>
             </div>
@@ -34,7 +33,7 @@
                 <select name="nivel_id" x-model="editNivelId" required
                     class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
                     @foreach ($niveles as $nivel)
-                        <option value="{{ $nivel->id_nivel }}">{{ $nivel->nivel }} - Turno: {{ $nivel->turno }}</option>
+                    <option value="{{ $nivel->id_nivel }}">{{ $nivel->nivel }} - Turno: {{ $nivel->turno }}</option>
                     @endforeach
                 </select>
             </div>
@@ -44,8 +43,8 @@
                 <select name="grado_id" x-model="editGradoId" required
                     class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
                     @foreach ($grados as $grado)
-                        <option value="{{ $grado->id_grado }}">{{ $grado->curso }} - Paralelo "{{ $grado->paralelo }}"
-                        </option>
+                    <option value="{{ $grado->id_grado }}">{{ $grado->curso }} - Paralelo "{{ $grado->paralelo }}"
+                    </option>
                     @endforeach
                 </select>
             </div>
@@ -55,7 +54,7 @@
                 <select name="materia_id" x-model="editMateriaId" required
                     class="w-full rounded-xl border-gray-200 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm">
                     @foreach ($materias as $materia)
-                        <option value="{{ $materia->id_materia }}">{{ $materia->nombre_materia }}</option>
+                    <option value="{{ $materia->id_materia }}">{{ $materia->nombre_materia }}</option>
                     @endforeach
                 </select>
             </div>
