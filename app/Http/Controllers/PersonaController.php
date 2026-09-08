@@ -2,83 +2,58 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePersonaRequest;
+use App\Http\Requests\UpdatePersonaRequest;
+use App\Actions\CreatePersonaAction;
+use App\Actions\UpdatePersonaAction;
 use App\Models\Persona;
 use App\Models\User;
-use Illuminate\Http\Request;
 
 class PersonaController extends Controller
 {
     public function index()
     {
         $personas = Persona::with('usuario')->get();
+
+        // Usuarios libres para el formulario de CREAR
         $usuariosLibres = User::doesntHave('persona')->get();
-        $usuarios = User::all(); // Para asociar la persona a un usuario existente si es necesario en la vista
+
+        // Todos los usuarios por si se necesitan (o para el select de edición)
+        $usuarios = User::all();
+
         return view('personas.index', compact('personas', 'usuariosLibres', 'usuarios'));
     }
 
-    public function store(Request $request)
+    public function store(StorePersonaRequest $request, CreatePersonaAction $action)
     {
-        $request->validate([
-            'usuario_id' => 'required|exists:usuarios,id_usuario',
-            'nombres' => 'required|string|max:50',
-            'apellidos' => 'required|string|max:50',
-            'ci' => 'required|string|max:20|unique:personas,ci',
-            'fecha_nacimiento' => 'required|string|max:20',
-            'profesion' => 'required|string|max:50',
-            'direccion' => 'required|string|max:255',
-            'celular' => 'required|string|max:20|unique:personas,celular',
-        ]);
+        $action->execute($request->validated());
 
-        Persona::create([
-            'usuario_id' => $request->usuario_id,
-            'nombres' => $request->nombres,
-            'apellidos' => $request->apellidos,
-            'ci' => $request->ci,
-            'fecha_nacimiento' => $request->fecha_nacimiento,
-            'profesion' => $request->profesion,
-            'direccion' => $request->direccion,
-            'celular' => $request->celular,
-            'estado' => true,
-        ]);
-
-        return redirect()->route('personas.index')->with('success', 'Persona registrada correctamente.');
+        return redirect()->route('personas.index')
+            ->with('success', 'Persona registrada correctamente.');
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdatePersonaRequest $request, $id, UpdatePersonaAction $action)
     {
         $persona = Persona::findOrFail($id);
 
-        $request->validate([
-            'nombres' => 'required|string|max:50',
-            'apellidos' => 'required|string|max:50',
-            // Validamos unicidad ignorando el id_persona actual
-            'ci' => 'required|string|max:20|unique:personas,ci,' . $id . ',id_persona',
-            'fecha_nacimiento' => 'required|string|max:20',
-            'profesion' => 'required|string|max:50',
-            'direccion' => 'required|string|max:255',
-            // Validamos unicidad ignorando el id_persona actual
-            'celular' => 'required|string|max:20|unique:personas,celular,' . $id . ',id_persona',
-        ]);
+        $action->execute($persona, $request->validated());
 
-        // El usuario_id se omite intencionalmente para proteger la integridad de la relación 1:1
-        $persona->update([
-            'nombres' => $request->nombres,
-            'apellidos' => $request->apellidos,
-            'ci' => $request->ci,
-            'fecha_nacimiento' => $request->fecha_nacimiento,
-            'profesion' => $request->profesion,
-            'direccion' => $request->direccion,
-            'celular' => $request->celular,
-        ]);
-
-        return redirect()->route('personas.index')->with('success', 'Persona actualizada correctamente.');
+        return redirect()->route('personas.index')
+            ->with('success', 'Persona actualizada correctamente.');
     }
 
     public function destroy($id)
     {
         $persona = Persona::findOrFail($id);
-        $persona->delete();
 
-        return redirect()->route('personas.index')->with('success', 'Persona eliminada correctamente.');
+        try {
+            $persona->delete();
+        } catch (\Illuminate\Database\QueryException $e) {
+            return redirect()->route('personas.index')
+                ->with('error', 'No se puede eliminar esta persona porque tiene registros relacionados.');
+        }
+
+        return redirect()->route('personas.index')
+            ->with('success', 'Persona eliminada correctamente.');
     }
 }
