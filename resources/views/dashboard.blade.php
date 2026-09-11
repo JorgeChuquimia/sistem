@@ -58,10 +58,25 @@
             </div>
 
         </div>
-
         <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
             <div class="max-w-3xl">
-                <h3 class="text-xl font-bold text-gray-900 mb-2">¡Bienvenido al Panel de Administración Escolar!</h3>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">
+                    ¡Bienvenido!:
+                    <span class="text-indigo-600">
+                        {{ Auth::user()->persona?->nombres }}
+                        {{ Auth::user()->persona?->apellidos }}
+                    </span>
+                </h3>
+
+                <!-- Badge opcional para mostrar el Rol -->
+                @if(Auth::user()->rol)
+                <div class="mb-3">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 uppercase">
+                        Rol: {{ Auth::user()->rol->nombre_rol }}
+                    </span>
+                </div>
+                @endif
+
                 <p class="text-gray-600 text-sm leading-relaxed mb-6">
                     Desde este panel centralizado puedes administrar de manera eficiente la estructura académica,
                     supervisar los registros de usuarios, gestionar roles y controlar el flujo de información de tu

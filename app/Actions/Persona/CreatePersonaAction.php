@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Actions;
+namespace App\Actions\Persona;
 
 use App\Models\Persona;
 use Illuminate\Support\Facades\DB;

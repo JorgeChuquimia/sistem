@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreUserRequest;
-use App\Http\Requests\UpdateUserRequest;
-use App\Actions\CreateUserAction;
-use App\Actions\UpdateUserAction;
+use App\Http\Requests\User\StoreUserRequest;
+use App\Http\Requests\User\UpdateUserRequest;
+use App\Actions\User\CreateUserAction;
+use App\Actions\User\UpdateUserAction;
 use App\Models\User;
 use App\Models\Role;
 

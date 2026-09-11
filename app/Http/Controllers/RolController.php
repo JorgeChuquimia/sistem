@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Role;
+use App\Http\Requests\Rol\StoreRolRequest;
+use App\Http\Requests\Rol\UpdateRolRequest;
+use App\Actions\Rol\CreateRolAction;
+use App\Actions\Rol\UpdateRolAction;
+use App\Actions\Rol\DeleteRolAction;
+use Illuminate\Validation\ValidationException;
 
 class RolController extends Controller
 {
@@ -13,40 +18,34 @@ class RolController extends Controller
         return view('roles.index', compact('roles'));
     }
 
-    public function store(Request $request)
+    public function store(StoreRolRequest $request, CreateRolAction $action)
     {
-        $request->validate([
-            'nombre_rol' => 'required|string|max:50|unique:roles,nombre_rol',
-        ]);
-
-        Role::create([
-            'nombre_rol' => mb_strtoupper($request->nombre_rol, 'UTF-8'),
-            'estado' => true,
-        ]);
+        $action->execute($request->validated());
 
         return redirect()->route('roles.index')->with('success', 'Rol creado exitosamente.');
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateRolRequest $request, $id, UpdateRolAction $action)
     {
-        $role = Role::findOrFail($id);
 
-        $request->validate([
-            'nombre_rol' => 'required|string|max:50|unique:roles,nombre_rol,' . $id . ',id_rol',
-        ]);
+        $role = Role::where('id_rol', $id)->firstOrFail();
 
-        $role->update([
-            'nombre_rol' => mb_strtoupper($request->nombre_rol, 'UTF-8'),
-        ]);
+        $action->execute($role, $request->validated());
 
         return redirect()->route('roles.index')->with('success', 'Rol actualizado exitosamente.');
     }
 
-    public function destroy($id)
+    public function destroy($id, DeleteRolAction $action)
     {
-        $role = Role::findOrFail($id);
-        $role->delete();
+        $role = Role::where('id_rol', $id)->firstOrFail();
 
-        return redirect()->route('roles.index')->with('success', 'Rol eliminado exitosamente.');
+        try {
+            $action->execute($role);
+
+            return redirect()->route('roles.index')
+                ->with('success', 'Rol eliminado exitosamente.');
+        } catch (ValidationException $e) {
+            return back()->withErrors($e->errors());
+        }
     }
 }

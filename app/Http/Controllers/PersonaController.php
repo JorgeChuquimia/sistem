@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StorePersonaRequest;
-use App\Http\Requests\UpdatePersonaRequest;
-use App\Actions\CreatePersonaAction;
-use App\Actions\UpdatePersonaAction;
+use App\Http\Requests\Persona\StorePersonaRequest;
+use App\Http\Requests\Persona\UpdatePersonaRequest;
+use App\Actions\Persona\CreatePersonaAction;
+use App\Actions\Persona\UpdatePersonaAction;
 use App\Models\Persona;
 use App\Models\User;
 
