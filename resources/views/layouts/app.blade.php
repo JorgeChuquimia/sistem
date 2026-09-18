@@ -143,7 +143,7 @@
             </main>
 
             <footer class="bg-white border-t border-gray-200 py-6 px-8 text-center text-sm text-gray-500">
-                <p>&copy; Sistema Escolar. Desarrollado por Jorge A. Chuquimia Apaza</p>
+                <p>&copy; Sistema Escolar. Desarrollado por JCA Software</p>
             </footer>
 
         </div>

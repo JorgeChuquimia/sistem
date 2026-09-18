@@ -6,8 +6,10 @@ use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Actions\User\CreateUserAction;
 use App\Actions\User\UpdateUserAction;
+use App\Actions\User\DeleteUserAction;
 use App\Models\User;
 use App\Models\Role;
+use Illuminate\Validation\ValidationException;
 
 class UserController extends Controller
 {
@@ -34,7 +36,7 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, $id, UpdateUserAction $action)
     {
-        $usuario = User::findOrFail($id);
+        $usuario = User::where('id_usuario', $id)->firstOrFail();
 
         $action->execute($usuario, $request->validated());
 
@@ -45,25 +47,17 @@ class UserController extends Controller
     /**
      * Elimina un usuario del sistema de forma segura.
      */
-    public function destroy($id)
+    public function destroy($id, DeleteUserAction $action)
     {
-        $usuario = User::findOrFail($id);
-
-        // Evitar que el administrador elimine su propia cuenta
-        if (auth()->id() == $usuario->id_usuario) {
-            return redirect()->route('usuarios.index')
-                ->with('error', 'No puedes eliminar tu propia cuenta de administrador.');
-        }
+        $usuario = User::where('id_usuario', $id)->firstOrFail();
 
         try {
-            $usuario->delete();
-        } catch (\Illuminate\Database\QueryException $e) {
-            // Captura errores de llave foránea si el usuario tiene registros en personas/docentes
-            return redirect()->route('usuarios.index')
-                ->with('error', 'No se puede eliminar este usuario porque tiene información de persona o docente vinculada.');
-        }
+            $action->execute($usuario);
 
-        return redirect()->route('usuarios.index')
-            ->with('success', 'Usuario eliminado correctamente.');
+            return redirect()->route('usuarios.index')
+                ->with('success', 'Usuario eliminado correctamente.');
+        } catch (ValidationException $e) {
+            return back()->withErrors($e->errors());
+        }
     }
 }
